@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
     QComboBox, QTextEdit, QLineEdit)
 from PyQt5.QtCore import Qt
 
-
 class ScoreDB(QWidget):
 
     def __init__(self):
@@ -14,89 +13,102 @@ class ScoreDB(QWidget):
         self.dbfilename = 'assignment6.dat'
         self.scoredb = []
         self.readScoreDB()
-        self.showScoreDB()
+        self.showScoreDB(isFirst=True)
 
     def initUI(self):
 
         # Interface Labels
-        self.nameLabel = QLabel("Name : ")
-        self.ageLabel = QLabel("Age : ")
-        self.scoreLabel = QLabel("Score : ")
-        self.amountLabel = QLabel("Amount : ")
-        self.sortLabel = QLabel("Key : ")
-        self.resultLabel = QLabel("Result : ")
+        self.label = {
+            'name' : QLabel("Name : "),
+            'age' : QLabel("Age : "),
+            'score' : QLabel("Score : "),
+            'amount' : QLabel("Amount : "),
+            'sort' : QLabel("Key : "),
+            'result' : QLabel("Result : ")
+        }
 
-        # Interface TextBox
-        self.nameTextBox = QLineEdit()
-        self.ageTextBox = QLineEdit()
-        self.scoreTextBox = QLineEdit()
-        self.amountTextBox = QLineEdit()
 
-        # Interface ComboBox
-        self.sortComboBox = QComboBox()
-        self.sortComboBox.addItems(['Name', 'Age', 'Score'])
+        # Interface TextBoxes
+        self.lineEdit = {
+            'name' : QLineEdit(),
+            'age' : QLineEdit(),
+            'score' : QLineEdit(),
+            'amount' : QLineEdit()
+        }
+
+
+        # Interface ComboBoxes
+        self.comboBox = {
+            'sort' : QComboBox()
+        }
+
+        self.comboBox['sort'].addItems(['Name', 'Age', 'Score'])
 
         # Interface Buttons
-        self.addButton = QPushButton("Add")
-        self.delButton = QPushButton('Delete')
-        self.findButton = QPushButton('Find')
-        self.incButton = QPushButton('Increase')
-        self.showButton = QPushButton('Show')
+        self.pushButton = {
+            'add' : QPushButton("Add"),
+            'del' : QPushButton('Delete'),
+            'find' : QPushButton('Find'),
+            'inc' : QPushButton('Increase'),
+            'show' : QPushButton('Show')
+        }
+
 
         # Interface TextEdit
-        self.resultTextEdit = QTextEdit()
-        self.resultTextEdit.setReadOnly(True)
+        self.textEdit = {
+            'result' : QTextEdit()
+        }
+
+        self.textEdit['result'].setReadOnly(True)
 
         # Interface Layout
-        horizentalLayout1 = QHBoxLayout()
-        horizentalLayout1.addStretch(1)
-        horizentalLayout1.addWidget(self.nameLabel)
-        horizentalLayout1.addWidget(self.nameTextBox)
-        horizentalLayout1.addWidget(self.ageLabel)
-        horizentalLayout1.addWidget(self.ageTextBox)
-        horizentalLayout1.addWidget(self.scoreLabel)
-        horizentalLayout1.addWidget(self.scoreTextBox)
+        self.boxLayout = {
+            'horizon1' : QHBoxLayout(),
+            'horizon2' : QHBoxLayout(),
+            'horizon3' : QHBoxLayout(),
+            'horizon4' : QHBoxLayout(),
+            'horizon5' : QHBoxLayout(),
+            'vertical1' : QVBoxLayout()
+        }
 
-        horizentalLayout2 = QHBoxLayout()
-        horizentalLayout2.addStretch(1)
-        horizentalLayout2.addWidget(self.amountLabel)
-        horizentalLayout2.addWidget(self.amountTextBox)
-        horizentalLayout2.addWidget(self.sortLabel)
-        horizentalLayout2.addWidget(self.sortComboBox)
+        for key in self.boxLayout:
+            self.boxLayout[key].addStretch(1)
 
-        horizentalLayout3 = QHBoxLayout()
-        horizentalLayout3.addStretch(1)
-        horizentalLayout3.addWidget(self.addButton)
-        horizentalLayout3.addWidget(self.delButton)
-        horizentalLayout3.addWidget(self.findButton)
-        horizentalLayout3.addWidget(self.incButton)
-        horizentalLayout3.addWidget(self.showButton)
+        self.boxLayout['horizon4'].setDirection(1)
+        self.boxLayout['horizon5'].setDirection(1)
 
-        horizentalLayout4 = QHBoxLayout()
-        horizentalLayout4.addStretch(1)
-        horizentalLayout4.addWidget(self.resultLabel)
+        # layout setting
+        layout_struct = [
+            [self.label['name'], self.lineEdit['name'], self.label['age'], self.lineEdit['age'],
+             self.label['score'], self.lineEdit['score']],
+            [self.label['amount'], self.lineEdit['amount'], self.label['sort'],
+             self.comboBox['sort']],
+            [self.pushButton['add'], self.pushButton['del'], self.pushButton['find'],
+             self.pushButton['inc'], self.pushButton['show']],
+            [self.label['result']],
+            [self.textEdit['result']],
+            [self.boxLayout['horizon1'], self.boxLayout['horizon2'], self.boxLayout['horizon3'],
+             self.boxLayout['horizon4'], self.boxLayout['horizon5']]
+        ]
 
-        horizentalLayout5 = QHBoxLayout()
-        horizentalLayout5.addStretch(1)
-        horizentalLayout5.addWidget(self.resultTextEdit)
+        for idx, layout in enumerate(self.boxLayout):
+            for widget in layout_struct[idx]:
+                if idx == len(self.boxLayout) - 1:
+                    self.boxLayout[layout].addLayout(widget)
 
-        verticalLayout = QVBoxLayout()
-        verticalLayout.addStretch(1)
-        verticalLayout.addLayout(horizentalLayout1)
-        verticalLayout.addLayout(horizentalLayout2)
-        verticalLayout.addLayout(horizentalLayout3)
-        verticalLayout.addLayout(horizentalLayout4)
-        verticalLayout.addLayout(horizentalLayout5)
+                else:
+                    self.boxLayout[layout].addWidget(widget)
 
         # Set Interace Layout
-        self.setLayout(verticalLayout)
+        self.setLayout(self.boxLayout['vertical1'])
+        self.setLayoutDirection(0)
 
         # Event Handle
-        self.addButton.clicked.connect(self.addScoreDB)
-        self.delButton.clicked.connect(self.delScoreDB)
-        self.showButton.clicked.connect(self.showScoreDB)
-        self.findButton.clicked.connect(self.findScoreDB)
-        self.incButton.clicked.connect(self.increasScoreDB)
+        self.pushButton['add'].clicked.connect(self.addScoreDB)
+        self.pushButton['del'].clicked.connect(self.delScoreDB)
+        self.pushButton['show'].clicked.connect(self.showScoreDB)
+        self.pushButton['find'].clicked.connect(self.findScoreDB)
+        self.pushButton['inc'].clicked.connect(self.increasScoreDB)
 
         # Interface Position Setting
         self.setGeometry(300, 300, 500, 250)
@@ -109,6 +121,7 @@ class ScoreDB(QWidget):
     def readScoreDB(self):
         try:
             fH = open(self.dbfilename, 'rb')
+
         except FileNotFoundError as e:
             self.scoredb = []
             return
@@ -120,6 +133,7 @@ class ScoreDB(QWidget):
             print("Fail to loading scoredb...")
 
         else:
+
             # Casting Data Type 'String' to 'Integer'
             for target in self.scoredb:
                 target['Score'], target['Age'] = int(target['Score']), int(target['Age'])
@@ -135,10 +149,28 @@ class ScoreDB(QWidget):
         pickle.dump(self.scoredb, fH)
         fH.close()
 
-    def showScoreDB(self):
-        dashboard = ''
-        keyname = self.sortComboBox.currentText()
+    # show the scoredb
+    def showScoreDB(self, isFirst=False):
 
+        # dashboard는 scoredb에 기록할 전체내용을 담은 문자열, keyname은 정렬 기준이 되는 값
+        dashboard = ''
+        keyname = ''
+
+        # scoredb의 내용을 처음 보여주는게 아닌지 확인
+        if not isFirst:
+
+            # showButton을 눌러서 보여진게 아니라면 이름순으로 정렬
+            if self.sender().text() != 'Show':
+                keyname = 'Name'
+
+            else :
+                keyname = self.comboBox['sort'].currentText()
+                #keyname = self.sortComboBox.currentText()
+
+        else:
+            keyname = self.comboBox['sort'].currentText()
+
+        # scoredb를 타겟 키를 기준으로 정렬(오름차순)
         try:
             for p in sorted(self.scoredb, key=lambda person: person[keyname]):
                 for attr in sorted(p):
@@ -153,35 +185,49 @@ class ScoreDB(QWidget):
         except KeyError as key_error:
             print("Please Input Valid Key!!!")
 
-        self.resultTextEdit.setPlainText(dashboard)
+        # 결과창에 scoredb의 내용을 띄운다.
+        self.textEdit['result'].setPlainText(dashboard)
 
+    # add person to scoredb
     def addScoreDB(self):
-        record = {'Name': self.nameTextBox.text().strip(), 'Age': int(self.ageTextBox.text().strip()), 'Score': int(self.scoreTextBox.text().strip())}
+
+        # 각각의 텍스트 입력창으로부터 값을 읽어와 디셔너리 형태로 저장한다.
+        record = {'Name': self.lineEdit['name'].text().strip().capitalize(), 'Age': int(self.lineEdit['age'].text().strip()), 'Score': int(self.lineEdit['score'].text().strip())}
         self.scoredb += [record]
 
+        # 추가가 성공적으로 이루어졌는지 확인한다.(정렬기준 : 이름)
         self.showScoreDB()
 
+    # delete person in scoredb
     def delScoreDB(self):
+
+        # 새로 등록할 DataBase를 생성
         new_scdb = []
 
+        # 지울 이름에 해당하는 딕셔너리들을 제외한 나머지를 담는다.
         for p in self.scoredb:
-            if p['Name'] == self.nameTextBox.text().strip():
+            if p['Name'] == self.lineEdit['name'].text().strip().capitalize():
                 pass
 
             else:
                 new_scdb.append(p)
 
+        # scoredb의 refernece를 읽지 않고 리스트를 비우기 위해 clear()를 사용
         self.scoredb.clear()
 
         for p in new_scdb:
             self.scoredb.append(p)
 
+        # 삭제가 성공적으로 되었는지 확인(정렬기준 : 이름)
         self.showScoreDB()
 
+    # increase target person's score
     def increasScoreDB(self):
 
-        value = self.amountTextBox.text()
+        # 증가시킬 값을 amount 입력창으로부터 가져옴
+        value = self.lineEdit['amount'].text().strip()
 
+        # 문자열을 숫자데이터 타입으로 변환
         try:
             if value in '.':
                 value = float(value)
@@ -193,17 +239,23 @@ class ScoreDB(QWidget):
             print("Value must be an Integer or Float")
             return True
 
+        # value값 만큼 해당되는 사람들의 점수를 올린다.
         for p in self.scoredb:
-            if p['Name'] == self.nameTextBox.text().strip():
+            if p['Name'] == self.lineEdit['name'].text().strip():
                 p['Score'] += int(value)
 
-        # 아직 구현이 덜 됨
+        # 증가가 성공적으로 이루어졌는지 확인(정렬기준 : 이름)
         self.showScoreDB()
 
+    # find person
     def findScoreDB(self):
+
+        # 결과 창에 보여질 전체 문자열
         wanted = ''
+
+        # 찾고자 하는 이름에 해당하는 사람들을 출력
         for p in self.scoredb:
-            if p['Name'] == self.nameTextBox.text().strip():
+            if p['Name'] == self.lineEdit['name'].text().strip():
                 for attr in p:
                     if attr == "Age" or attr == "Score":
                         wanted += str(attr) + "=" + str(p[attr]) + '\t'
@@ -213,10 +265,10 @@ class ScoreDB(QWidget):
 
                 wanted += '\n'
 
+        # 찾고자 하는 사람들을 출력
         self.resultTextEdit.setPlainText(wanted)
 
 if __name__ == '__main__':    
     app = QApplication(sys.argv)
     ex = ScoreDB()
     sys.exit(app.exec_())
-
